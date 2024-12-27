@@ -3,20 +3,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config(); // Ensure .env is loaded first
-// Verify that dotenv loaded the variables
-console.log('Environment Variables Loaded:');
-console.log('PORT:', process.env.PORT); // Log the value of the PORT from .env
-console.log('JWT_SECRET_KEY:', process.env.JWT_SECRET); // Log another variable as a test
 const express_1 = __importDefault(require("express"));
-const userroutes_1 = __importDefault(require("./routes/userroutes"));
-const db_1 = __importDefault(require("./db/db"));
-const port = process.env.PORT || 3000; // Use the PORT defined in .env, fallback to 3000 if not set
+const morgan_1 = __importDefault(require("morgan"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const knex_1 = __importDefault(require("./db/knex"));
+const boardRoutes_1 = __importDefault(require("./routes/boardRoutes"));
+const cardRoutes_1 = __importDefault(require("./routes/cardRoutes"));
+const listRoutes_1 = __importDefault(require("./routes/listRoutes"));
+// Load environment variables
+dotenv_1.default.config();
 const app = (0, express_1.default)();
-(0, db_1.default)(); // Database connection
-app.use(express_1.default.json()); // To parse JSON bodies
-app.use('/api/users', userroutes_1.default);
+const port = process.env.PORT || 6000;
+app.use(body_parser_1.default.json());
+app.use((0, morgan_1.default)('tiny')); // Request logging
+(0, knex_1.default)();
+// Routes
+app.use('/api/boards', boardRoutes_1.default);
+app.use('/api/cards', cardRoutes_1.default);
+app.use('/api/lists', listRoutes_1.default);
+// Error handling middleware
+// Start the server
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });

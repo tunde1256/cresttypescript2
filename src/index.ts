@@ -1,21 +1,38 @@
+import express, { Request, Response } from 'express';
+import axios from 'axios';
+import morgan from 'morgan';
+import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import db from './db/knex'; 
+import boardRoutes from './routes/boardRoutes';
+import cardRoutes from './routes/cardRoutes';
+import listRoutes from './routes/listRoutes';
+
+
+
+// Load environment variables
 dotenv.config();
 
-console.log('Environment Variables Loaded:');
-console.log('PORT:', process.env.PORT);
-console.log('JWT_SECRET_KEY:', process.env.JWT_SECRET);
+const app = express();
+const port = process.env.PORT || 6000;
 
-import express, { Application } from 'express';
-import userRoutes from './routes/userroutes';
-import db from './db/db';
+app.use(bodyParser.json());
+app.use(morgan('tiny')); // Request logging
+ db();
 
-const port = process.env.PORT || 3000;
 
-const app: Application = express();
-db();
-app.use(express.json());
-app.use('/api/users', userRoutes);
+ // Routes
+ app.use('/api/boards', boardRoutes);
+ app.use('/api/cards', cardRoutes);
+ app.use('/api/lists', listRoutes);
 
+
+
+
+// Error handling middleware
+
+
+// Start the server
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
