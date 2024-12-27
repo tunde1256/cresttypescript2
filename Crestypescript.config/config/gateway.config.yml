@@ -1,0 +1,46 @@
+http:
+  port: 8080
+
+admin:
+  port: 9876
+  host: localhost
+
+apiEndpoints:
+  users:
+    paths: '/api/users/*'
+  boards:
+    paths: '/api/boards/*'
+  cards:
+    paths: '/api/cards/*'
+  lists:
+    paths: '/api/lists/*'
+
+serviceEndpoints:
+  userService:
+    url: 'http://localhost:4040'
+  boardService:
+    url: 'http://localhost:5050'
+
+policies:
+  - proxy
+
+pipelines:
+  userPipeline:
+    apiEndpoints:
+      - users
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: userService
+              changeOrigin: true
+
+  boardPipeline:
+    apiEndpoints:
+      - boards
+      - cards
+      - lists
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: boardService
+              changeOrigin: true
